@@ -14,9 +14,20 @@ const axios = require("axios");
 
     console.log("✅ RESPONSE RECEIVED:");
     console.log(res.data);
+  } catch (error) {
+    console.log("❌ FULL ERROR OBJECT:");
+    console.log(error);
 
-  } catch (err) {
-    console.log("❌ ERROR:");
-    console.log(err.response?.data || err.message);
-  }
-})();
+  console.log("❌ RESPONSE DATA:");
+  console.log(error.response?.data);
+
+  console.log("❌ STATUS:");
+  console.log(error.response?.status);
+
+  console.log("❌ MESSAGE:");
+  console.log(error.message);
+
+  return res.status(500).json({
+    error: error.response?.data || error.message
+  });
+}

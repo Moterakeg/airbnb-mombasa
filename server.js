@@ -34,7 +34,10 @@ async function getAccessToken() {
 }
 
 // 📱 STK PUSH
-app.post("/stkpush", async (req, res) => {
+app.post("/stkpush", async (req, res) => {console.log("🔥 STK ROUTE HIT");
+console.log("BODY:", req.body);
+console.log("SHORTCODE:", process.env.SHORTCODE);
+console.log("PASSKEY EXISTS:", !!process.env.PASSKEY);
   try {
     let { phone, amount, reference } = req.body;
 
