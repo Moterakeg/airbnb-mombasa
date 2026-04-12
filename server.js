@@ -7,13 +7,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // 🔍 ENV CHECK
 console.log("🔑 CONSUMER KEY:", process.env.CONSUMER_KEY ? "OK" : "MISSING");
 console.log("🔑 CONSUMER SECRET:", process.env.CONSUMER_SECRET ? "OK" : "MISSING");
 console.log("🔑 PASSKEY:", process.env.PASSKEY ? "OK" : "MISSING");
-console.log("🔑 SHORTCODE:", process.env.BUSINESS_SHORTCODE ? "OK" : "MISSING");
+console.log("🔑 SHORTCODE:", process.env.SHORTCODE ? "OK" : "MISSING");
 
 // 🔐 ACCESS TOKEN
 async function getAccessToken() {
@@ -24,41 +24,27 @@ async function getAccessToken() {
     `${process.env.CONSUMER_KEY}:${process.env.CONSUMER_SECRET}`
   ).toString("base64");
 
-  console.log("🔐 Getting access token...");
-
   const response = await axios.get(url, {
     headers: {
       Authorization: "Basic " + auth,
     },
   });
 
-  console.log("🔑 TOKEN RESPONSE:", response.data);
-
   return response.data.access_token;
 }
 
-// 📱 STK PUSH ROUTE
+// 📱 STK PUSH
 app.post("/stkpush", async (req, res) => {
-  console.log("🔥 STK ROUTE HIT");
-  console.log("BODY:", req.body);
-
   try {
     let { phone, amount, reference } = req.body;
 
     if (!phone || !amount) {
-      return res.status(400).json({
-        error: "Phone and amount required",
-      });
+      return res.status(400).json({ error: "Phone and amount required" });
     }
 
-    // 📞 FORMAT PHONE NUMBER
-    if (phone.startsWith("0")) {
-      phone = "254" + phone.substring(1);
-    } else if (phone.startsWith("+")) {
-      phone = phone.replace("+", "");
-    }
-
-    console.log("📞 FORMATTED PHONE:", phone);
+    // format phone
+    if (phone.startsWith("0")) phone = "254" + phone.substring(1);
+    if (phone.startsWith("+")) phone = phone.replace("+", "");
 
     const token = await getAccessToken();
 
@@ -68,26 +54,22 @@ app.post("/stkpush", async (req, res) => {
       .slice(0, 14);
 
     const password = Buffer.from(
-      process.env.BUSINESS_SHORTCODE +
-        process.env.PASSKEY +
-        timestamp
+      process.env.SHORTCODE + process.env.PASSKEY + timestamp
     ).toString("base64");
 
     const stkData = {
-      BusinessShortCode: process.env.BUSINESS_SHORTCODE,
+      BusinessShortCode: process.env.SHORTCODE,
       Password: password,
       Timestamp: timestamp,
       TransactionType: "CustomerPayBillOnline",
       Amount: amount,
       PartyA: phone,
-      PartyB: process.env.BUSINESS_SHORTCODE,
+      PartyB: process.env.SHORTCODE,
       PhoneNumber: phone,
-      CallBackURL: "https://example.com/callback",
+      CallBackURL: process.env.CALLBACK_URL,
       AccountReference: reference || "BOOKING",
-      TransactionDesc: "Hotel Booking Payment",
+      TransactionDesc: "Payment",
     };
-
-    console.log("📤 SENDING STK REQUEST...");
 
     const response = await axios.post(
       "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
@@ -99,21 +81,16 @@ app.post("/stkpush", async (req, res) => {
       }
     );
 
-    console.log("✅ STK SUCCESS:", response.data);
-
     res.json(response.data);
 
   } catch (error) {
-    console.log("❌ FULL SAFARICOM ERROR:");
-    console.log(error.response?.data || error.message);
-
     res.status(500).json({
       error: error.response?.data || error.message,
     });
   }
 });
 
-// 🚀 START SERVER
+// 🚀 START
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Server running on ${PORT}`);
 });
