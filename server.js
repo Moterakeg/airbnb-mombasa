@@ -1,4 +1,6 @@
-require("dotenv").config();
+app.post("/stkpush", async (req, res) => {
+  console.log("🔍 SHORTCODE VALUE:", process.env.BUSINESS_SHORTCODE);
+  console.log("🔍 SHORTCODE TYPE:", typeof process.env.BUSINESS_SHORTCODE);require("dotenv").config();
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
