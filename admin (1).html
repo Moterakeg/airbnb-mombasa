@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Airbnb Mombasa — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root{--ocean:#0A4F6E;--ocean-mid:#1A7A9A;--teal:#2AAFBE;--teal-light:rgba(42,175,190,0.12);--sand:#F5EDD8;--coral:#E8614A;--coral-light:rgba(232,97,74,0.12);--white:#FDFCF9;--charcoal:#1A2E35;--muted:#6B8490;--border:#DDE8EC;--card:#FFFFFF;--green:#00A650;--green-light:rgba(0,166,80,0.1);--red:#E05A5A;--red-light:rgba(224,90,90,0.1);--gold:#D4A853;--gold-light:rgba(212,168,83,0.1);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Outfit',sans-serif;background:#F0F4F6;display:flex;min-height:100vh;}
+
+  .sidebar{width:230px;min-height:100vh;background:var(--charcoal);flex-shrink:0;position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;}
+  .slogo{padding:26px 22px 18px;border-bottom:1px solid rgba(255,255,255,0.08);}
+  .slogo-main{font-family:'Playfair Display',serif;font-size:1.15rem;color:#fff;font-weight:700;}
+  .slogo-main span{color:var(--coral);}
+  .slogo-sub{font-size:0.67rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;}
+  .snav{padding:18px 0;flex:1;}
+  .sitem{display:flex;align-items:center;gap:11px;padding:11px 22px;color:rgba(255,255,255,0.45);font-size:0.85rem;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;}
+  .sitem:hover,.sitem.on{background:rgba(255,255,255,0.06);color:#fff;border-left-color:var(--coral);}
+  .sitem .si{font-size:1rem;width:18px;text-align:center;}
+  .sfoot{padding:18px 22px;border-top:1px solid rgba(255,255,255,0.08);}
+  .sfoot a{color:rgba(255,255,255,0.35);font-size:0.8rem;text-decoration:none;display:flex;align-items:center;gap:7px;}
+  .sfoot a:hover{color:var(--teal);}
+
+  .main{margin-left:230px;flex:1;padding:28px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
+  .ptitle{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--charcoal);}
+  .tbr{display:flex;align-items:center;gap:12px;}
+  .dbadge{background:var(--card);border:1px solid var(--border);padding:7px 14px;border-radius:50px;font-size:0.78rem;color:var(--muted);}
+  .rfbtn{background:var(--teal);color:#fff;border:none;padding:7px 16px;border-radius:50px;font-size:0.78rem;cursor:pointer;font-family:'Outfit',sans-serif;}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px;}
+  .kcard{background:var(--card);border-radius:16px;padding:22px;border:1px solid var(--border);position:relative;overflow:hidden;}
+  .kcard::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;}
+  .kcard.kt::after{background:var(--coral-light);}
+  .kcard.kg::after{background:var(--green-light);}
+  .kcard.ko::after{background:var(--gold-light);}
+  .kcard.kb::after{background:var(--teal-light);}
+  .klabel{font-size:0.7rem;color:var(--muted);font-weight:600;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:8px;}
+  .kval{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--charcoal);}
+  .ksub{font-size:0.72rem;color:var(--muted);margin-top:5px;}
+  .kicon{position:absolute;top:18px;right:18px;font-size:1.4rem;}
+
+  .view{display:none;}.view.on{display:block;}
+
+  .fbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+  .finput{background:var(--card);border:1px solid var(--border);border-radius:50px;padding:8px 16px;font-family:'Outfit',sans-serif;font-size:0.83rem;color:var(--charcoal);outline:none;min-width:220px;transition:border-color 0.2s;}
+  .finput:focus{border-color:var(--teal);}
+  .fsel{background:var(--card);border:1px solid var(--border);border-radius:50px;padding:8px 16px;font-family:'Outfit',sans-serif;font-size:0.83rem;color:var(--charcoal);outline:none;cursor:pointer;}
+  .expbtn{margin-left:auto;background:var(--charcoal);color:#fff;border:none;padding:8px 16px;border-radius:50px;font-size:0.78rem;cursor:pointer;font-family:'Outfit',sans-serif;}
+
+  .tcard{background:var(--card);border-radius:18px;border:1px solid var(--border);overflow:hidden;}
+  .tchead{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .tctitle{font-weight:600;color:var(--charcoal);font-size:0.9rem;}
+  .tccount{font-size:0.77rem;color:var(--muted);}
+  table{width:100%;border-collapse:collapse;}
+  thead th{background:#F7FAFB;padding:11px 14px;text-align:left;font-size:0.68rem;color:var(--muted);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid var(--border);}
+  tbody tr{border-bottom:1px solid var(--border);transition:background 0.15s;}
+  tbody tr:last-child{border-bottom:none;}
+  tbody tr:hover{background:#F7FAFB;}
+  td{padding:13px 14px;font-size:0.83rem;color:var(--charcoal);vertical-align:middle;}
+  .rchip{background:var(--coral-light);color:var(--coral);padding:3px 9px;border-radius:50px;font-size:0.71rem;font-weight:600;font-family:monospace;}
+  .sbadge{padding:3px 10px;border-radius:50px;font-size:0.68rem;font-weight:600;}
+  .sc{background:var(--teal-light);color:var(--teal);}
+  .si2{background:var(--green-light);color:var(--green);}
+  .so{background:#F0F0F0;color:#888;}
+  .sca{background:var(--red-light);color:var(--red);}
+  .abts{display:flex;gap:5px;}
+  .abt{border:none;padding:4px 10px;border-radius:50px;font-size:0.68rem;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:500;transition:all 0.15s;}
+  .abt-v{background:var(--coral-light);color:var(--coral);}.abt-v:hover{background:var(--coral);color:#fff;}
+  .abt-i{background:var(--green-light);color:var(--green);}.abt-i:hover{background:var(--green);color:#fff;}
+  .abt-o{background:var(--gold-light);color:#7A5A10;}.abt-o:hover{background:var(--gold);color:#fff;}
+  .abt-c{background:var(--red-light);color:var(--red);}.abt-c:hover{background:var(--red);color:#fff;}
+  .empty{text-align:center;padding:50px;color:var(--muted);font-size:0.85rem;}
+
+  .revgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+  .revcard{background:var(--card);border-radius:16px;padding:22px;border:1px solid var(--border);text-align:center;}
+  .revcard h4{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;}
+  .revval{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--charcoal);}
+  .revsub{font-size:0.74rem;color:var(--muted);margin-top:4px;}
+
+  .dm-ov{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+  .dm-ov.on{display:flex;}
+  .dbox{background:#fff;border-radius:22px;padding:32px;max-width:500px;width:90%;animation:pop 0.22s ease both;}
+  .dbh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;}
+  .dbn{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--charcoal);}
+  .dbref{font-size:0.75rem;color:var(--muted);margin-top:3px;}
+  .dbcls{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);}
+  .dbg{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+  .dbf label{font-size:0.67rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:3px;}
+  .dbf p{font-size:0.88rem;color:var(--charcoal);font-weight:500;}
+  .dbdiv{border:none;border-top:1px solid var(--border);margin:14px 0;}
+  .dbtrow{display:flex;justify-content:space-between;align-items:center;}
+  .dbtlbl{font-size:0.82rem;color:var(--muted);}
+  .dbtval{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--coral);}
+  .dbacts{display:flex;gap:8px;margin-top:18px;}
+  .dbact{flex:1;padding:10px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;}
+
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--charcoal);color:#fff;padding:11px 20px;border-radius:50px;font-size:0.82rem;z-index:9999;opacity:0;transform:translateY(60px);transition:all 0.3s;}
+  .toast.show{opacity:1;transform:translateY(0);}
+  @keyframes pop{from{opacity:0;transform:scale(0.9);}to{opacity:1;transform:scale(1);}}
+  @media(max-width:700px){.kpis{grid-template-columns:1fr 1fr;}.sidebar{width:160px;}.main{margin-left:160px;}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="slogo">
+    <div class="slogo-main">Airbnb <span>Mombasa</span></div>
+    <div class="slogo-sub">Admin Panel</div>
+  </div>
+  <nav class="snav">
+    <div class="sitem on" onclick="sv('dashboard',this)"><span class="si">📊</span> Dashboard</div>
+    <div class="sitem" onclick="sv('bookings',this)"><span class="si">📋</span> All Bookings</div>
+    <div class="sitem" onclick="sv('checkedin',this)"><span class="si">✅</span> Checked In</div>
+    <div class="sitem" onclick="sv('checkedout',this)"><span class="si">🚪</span> Checked Out</div>
+    <div class="sitem" onclick="sv('revenue',this)"><span class="si">💰</span> Revenue</div>
+  </nav>
+  <div class="sfoot"><a href="index.html">← Back to Website</a></div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="ptitle" id="ptitle">Dashboard</div>
+    <div class="tbr">
+      <div class="dbadge" id="dbadge"></div>
+      <button class="rfbtn" onclick="la()">↻ Refresh</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="view on" id="vw-dashboard">
+    <div class="kpis">
+      <div class="kcard kt"><div class="kicon">📋</div><div class="klabel">Total Bookings</div><div class="kval" id="k-total">0</div><div class="ksub">All time</div></div>
+      <div class="kcard kg"><div class="kicon">✅</div><div class="klabel">Checked In</div><div class="kval" id="k-in">0</div><div class="ksub">Currently staying</div></div>
+      <div class="kcard ko"><div class="kicon">💰</div><div class="klabel">Revenue</div><div class="kval" id="k-rev">—</div><div class="ksub">From completed stays</div></div>
+      <div class="kcard kb"><div class="kicon">🏠</div><div class="klabel">Pending Arrival</div><div class="kval" id="k-pend">0</div><div class="ksub">Confirmed, not in yet</div></div>
+    </div>
+    <div class="fbar">
+      <input class="finput" id="ds" placeholder="🔍  Search name, ref, phone, room..." oninput="rt('ds','df','dt','dc')"/>
+      <select class="fsel" id="df" onchange="rt('ds','df','dt','dc')">
+        <option value="all">All Statuses</option><option value="Confirmed">Confirmed</option>
+        <option value="Checked In">Checked In</option><option value="Checked Out">Checked Out</option><option value="Cancelled">Cancelled</option>
+      </select>
+      <button class="expbtn" onclick="exp()">⬇ Export CSV</button>
+    </div>
+    <div class="tcard">
+      <div class="tchead"><div class="tctitle">All Bookings</div><div class="tccount" id="dc">—</div></div>
+      <div style="overflow-x:auto;"><table><thead><tr><th>Ref</th><th>Guest</th><th>Phone</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Nights</th><th>Total (KSh)</th><th>Status</th><th>Actions</th></tr></thead><tbody id="dt"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- BOOKINGS -->
+  <div class="view" id="vw-bookings">
+    <div class="fbar">
+      <input class="finput" id="bs" placeholder="🔍  Search..." oninput="rt('bs','bf','bt','bc')"/>
+      <select class="fsel" id="bf" onchange="rt('bs','bf','bt','bc')"><option value="all">All</option><option value="Confirmed">Confirmed</option><option value="Checked In">Checked In</option><option value="Checked Out">Checked Out</option><option value="Cancelled">Cancelled</option></select>
+      <button class="expbtn" onclick="exp()">⬇ Export CSV</button>
+    </div>
+    <div class="tcard"><div class="tchead"><div class="tctitle">All Bookings</div><div class="tccount" id="bc">—</div></div><div style="overflow-x:auto;"><table><thead><tr><th>Ref</th><th>Guest</th><th>Phone</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Nights</th><th>Total (KSh)</th><th>Status</th><th>Actions</th></tr></thead><tbody id="bt"></tbody></table></div></div>
+  </div>
+
+  <!-- CHECKED IN -->
+  <div class="view" id="vw-checkedin">
+    <div class="tcard"><div class="tchead"><div class="tctitle">Currently Checked In</div><div class="tccount" id="cic">—</div></div><div style="overflow-x:auto;"><table><thead><tr><th>Ref</th><th>Guest</th><th>Phone</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Nights</th><th>Total (KSh)</th><th>Status</th><th>Actions</th></tr></thead><tbody id="cit"></tbody></table></div></div>
+  </div>
+
+  <!-- CHECKED OUT -->
+  <div class="view" id="vw-checkedout">
+    <div class="tcard"><div class="tchead"><div class="tctitle">Checked Out Guests</div><div class="tccount" id="coc">—</div></div><div style="overflow-x:auto;"><table><thead><tr><th>Ref</th><th>Guest</th><th>Phone</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Nights</th><th>Total (KSh)</th><th>Status</th><th>Actions</th></tr></thead><tbody id="cot"></tbody></table></div></div>
+  </div>
+
+  <!-- REVENUE -->
+  <div class="view" id="vw-revenue">
+    <div class="revgrid">
+      <div class="revcard"><h4>Total Revenue</h4><div class="revval" id="rv-t">—</div><div class="revsub">Checked-out stays</div></div>
+      <div class="revcard"><h4>Studio</h4><div class="revval" id="rv-s">—</div><div class="revsub"><span id="rv-sc">0</span> stays</div></div>
+      <div class="revcard"><h4>1 Bedroom</h4><div class="revval" id="rv-1">—</div><div class="revsub"><span id="rv-1c">0</span> stays</div></div>
+    </div>
+    <div class="revgrid">
+      <div class="revcard"><h4>2 Bedroom</h4><div class="revval" id="rv-2">—</div><div class="revsub"><span id="rv-2c">0</span> stays</div></div>
+      <div class="revcard"><h4>Avg Stay (nights)</h4><div class="revval" id="rv-avg">—</div><div class="revsub">Across all bookings</div></div>
+      <div class="revcard"><h4>Guests Served</h4><div class="revval" id="rv-g">—</div><div class="revsub">Checked-out total</div></div>
+    </div>
+  </div>
+</main>
+
+<!-- DETAIL MODAL -->
+<div class="dm-ov" id="dmodal">
+  <div class="dbox">
+    <div class="dbh"><div><div class="dbn" id="dm-name">—</div><div class="dbref" id="dm-ref">—</div></div><button class="dbcls" onclick="cdm()">✕</button></div>
+    <div class="dbg">
+      <div class="dbf"><label>Phone</label><p id="dm-ph">—</p></div>
+      <div class="dbf"><label>Email</label><p id="dm-em">—</p></div>
+      <div class="dbf"><label>ID / Passport</label><p id="dm-id">—</p></div>
+      <div class="dbf"><label>Guests</label><p id="dm-gst">—</p></div>
+      <div class="dbf"><label>Room</label><p id="dm-rm">—</p></div>
+      <div class="dbf"><label>Status</label><p id="dm-st">—</p></div>
+      <div class="dbf"><label>Check-in</label><p id="dm-ci">—</p></div>
+      <div class="dbf"><label>Check-out</label><p id="dm-co">—</p></div>
+      <div class="dbf"><label>Nights</label><p id="dm-ni">—</p></div>
+      <div class="dbf"><label>Booked At</label><p id="dm-ba">—</p></div>
+    </div>
+    <hr class="dbdiv"/>
+    <div class="dbtrow"><span class="dbtlbl">Total Amount</span><span class="dbtval" id="dm-tot">—</span></div>
+    <div class="dbacts" id="dm-acts"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let bks=[];let cref=null;
+  function la(){bks=JSON.parse(localStorage.getItem('havenBookings')||'[]');kpis();rt('ds','df','dt','dc');rt('bs','bf','bt','bc');filt('Checked In','cit','cic');filt('Checked Out','cot','coc');rev();}
+  function kpis(){document.getElementById('k-total').textContent=bks.length;document.getElementById('k-in').textContent=bks.filter(b=>b.status==='Checked In').length;const r=bks.filter(b=>b.status==='Checked Out').reduce((s,b)=>s+b.total,0);document.getElementById('k-rev').textContent=r?'KSh '+r.toLocaleString():'—';document.getElementById('k-pend').textContent=bks.filter(b=>b.status==='Confirmed').length;}
+  function sb(s){const m={'Confirmed':'sbadge sc','Checked In':'sbadge si2','Checked Out':'sbadge so','Cancelled':'sbadge sca'}[s]||'sbadge sc';return`<span class="${m}">${s}</span>`;}
+  function ab(b){let h=`<button class="abt abt-v" onclick="odm('${b.ref}')">👁</button>`;if(b.status==='Confirmed')h+=`<button class="abt abt-i" onclick="us('${b.ref}','Checked In')">Check In</button>`;if(b.status==='Checked In')h+=`<button class="abt abt-o" onclick="us('${b.ref}','Checked Out')">Check Out</button>`;if(b.status!=='Cancelled'&&b.status!=='Checked Out')h+=`<button class="abt abt-c" onclick="us('${b.ref}','Cancelled')">Cancel</button>`;return`<div class="abts">${h}</div>`;}
+  function fd(d){if(!d)return'—';const[y,m,day]=d.split('-');const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return`${day} ${mn[parseInt(m)-1]} ${y}`;}
+  function row(b){return`<tr><td><span class="rchip">${b.ref}</span></td><td><strong>${b.name}</strong></td><td>${b.phone}</td><td>${b.roomName}</td><td>${fd(b.checkin)}</td><td>${fd(b.checkout)}</td><td>${b.nights}</td><td>${b.total.toLocaleString()}</td><td>${sb(b.status)}</td><td>${ab(b)}</td></tr>`;}
+  function rt(sid,fid,tid,cid){const q=(document.getElementById(sid)||{}).value||'';const sf=(document.getElementById(fid)||{}).value||'all';let d=[...bks];if(sf!=='all')d=d.filter(b=>b.status===sf);if(q){const ql=q.toLowerCase();d=d.filter(b=>(b.name||'').toLowerCase().includes(ql)||(b.ref||'').toLowerCase().includes(ql)||(b.phone||'').includes(ql)||(b.roomName||'').toLowerCase().includes(ql));}d.sort((a,b)=>new Date(b.bookedAt)-new Date(a.bookedAt));const tb=document.getElementById(tid);const cc=document.getElementById(cid);if(!tb)return;cc.textContent=d.length+' record'+(d.length!==1?'s':'');tb.innerHTML=d.length?d.map(row).join(''):`<tr><td colspan="10"><div class="empty">📭 No bookings found</div></td></tr>`;}
+  function filt(st,tid,cid){let d=bks.filter(b=>b.status===st);d.sort((a,b)=>new Date(b.bookedAt)-new Date(a.bookedAt));const tb=document.getElementById(tid);document.getElementById(cid).textContent=d.length+' record'+(d.length!==1?'s':'');tb.innerHTML=d.length?d.map(row).join(''):`<tr><td colspan="10"><div class="empty">📭 No ${st.toLowerCase()} guests</div></td></tr>`;}
+  function us(ref,ns){const msgs={'Checked In':'Mark as Checked In?','Checked Out':'Mark as Checked Out?','Cancelled':'Cancel this booking?'};if(!confirm(msgs[ns]))return;const i=bks.findIndex(b=>b.ref===ref);if(i<0)return;bks[i].status=ns;if(ns==='Checked In')bks[i].actualCheckinTime=new Date().toISOString();if(ns==='Checked Out')bks[i].actualCheckoutTime=new Date().toISOString();localStorage.setItem('havenBookings',JSON.stringify(bks));la();cdm();toast('✅ Status updated to '+ns);}
+  function odm(ref){cref=ref;const b=bks.find(b=>b.ref===ref);if(!b)return;document.getElementById('dm-name').textContent=b.name;document.getElementById('dm-ref').textContent='Ref: #'+b.ref;document.getElementById('dm-ph').textContent=b.phone;document.getElementById('dm-em').textContent=b.email||'—';document.getElementById('dm-id').textContent=b.idNo;document.getElementById('dm-gst').textContent=b.guests+' guest(s)';document.getElementById('dm-rm').textContent=b.roomName;document.getElementById('dm-st').textContent=b.status;document.getElementById('dm-ci').textContent=fd(b.checkin);document.getElementById('dm-co').textContent=fd(b.checkout);document.getElementById('dm-ni').textContent=b.nights+' night(s)';document.getElementById('dm-ba').textContent=new Date(b.bookedAt).toLocaleString('en-KE');document.getElementById('dm-tot').textContent='KSh '+b.total.toLocaleString();let a='';if(b.status==='Confirmed')a+=`<button class="dbact" style="background:var(--green-light);color:var(--green);" onclick="us('${b.ref}','Checked In')">✅ Check In</button>`;if(b.status==='Checked In')a+=`<button class="dbact" style="background:var(--gold-light);color:#7A5A10;" onclick="us('${b.ref}','Checked Out')">🚪 Check Out</button>`;if(b.status!=='Cancelled'&&b.status!=='Checked Out')a+=`<button class="dbact" style="background:var(--red-light);color:var(--red);" onclick="us('${b.ref}','Cancelled')">✕ Cancel</button>`;document.getElementById('dm-acts').innerHTML=a;document.getElementById('dmodal').classList.add('on');}
+  function cdm(){document.getElementById('dmodal').classList.remove('on');}
+  function rev(){const co=bks.filter(b=>b.status==='Checked Out');const t=co.reduce((s,b)=>s+b.total,0);document.getElementById('rv-t').textContent=t?'KSh '+t.toLocaleString():'—';const rv=arr=>arr.reduce((s,b)=>s+b.total,0);const st=co.filter(b=>b.roomName.toLowerCase().includes('studio'));const b1=co.filter(b=>b.roomName.toLowerCase().includes('1 bedroom'));const b2=co.filter(b=>b.roomName.toLowerCase().includes('2 bedroom'));document.getElementById('rv-s').textContent=st.length?'KSh '+rv(st).toLocaleString():'—';document.getElementById('rv-sc').textContent=st.length;document.getElementById('rv-1').textContent=b1.length?'KSh '+rv(b1).toLocaleString():'—';document.getElementById('rv-1c').textContent=b1.length;document.getElementById('rv-2').textContent=b2.length?'KSh '+rv(b2).toLocaleString():'—';document.getElementById('rv-2c').textContent=b2.length;document.getElementById('rv-avg').textContent=bks.length?(bks.reduce((s,b)=>s+b.nights,0)/bks.length).toFixed(1):'—';document.getElementById('rv-g').textContent=co.length;}
+  function sv(id,el){document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));document.querySelectorAll('.sitem').forEach(s=>s.classList.remove('on'));document.getElementById('vw-'+id).classList.add('on');if(el)el.classList.add('on');const titles={dashboard:'Dashboard',bookings:'All Bookings',checkedin:'Checked In',checkedout:'Checked Out',revenue:'Revenue'};document.getElementById('ptitle').textContent=titles[id]||id;la();}
+  function exp(){const h=['Ref','Name','Phone','Email','ID','Room','Guests','Check-in','Check-out','Nights','Total (KSh)','Status','Booked At'];const rows=bks.map(b=>[b.ref,b.name,b.phone,b.email||'',b.idNo,b.roomName,b.guests,b.checkin,b.checkout,b.nights,b.total,b.status,new Date(b.bookedAt).toLocaleString()]);const csv=[h,...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='airbnb-mombasa-bookings.csv';a.click();}
+  function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+  document.getElementById('dmodal').addEventListener('click',function(e){if(e.target===this)cdm();});
+  document.getElementById('dbadge').textContent=new Date().toLocaleDateString('en-KE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  la();
+</script>
+</body>
+</html>

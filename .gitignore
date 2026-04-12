@@ -1,0 +1,10 @@
+# Secret keys — never upload these
+.env
+
+# Auto-generated files
+node_modules/
+bookings.json
+
+# System files
+.DS_Store
+Thumbs.db
