@@ -14,6 +14,8 @@ console.log("🔑 CONSUMER KEY:", process.env.CONSUMER_KEY ? "OK" : "MISSING");
 console.log("🔑 CONSUMER SECRET:", process.env.CONSUMER_SECRET ? "OK" : "MISSING");
 console.log("🔑 PASSKEY:", process.env.PASSKEY ? "OK" : "MISSING");
 console.log("🔑 SHORTCODE:", process.env.SHORTCODE ? "OK" : "MISSING");
+console.log("🔍 RAW SHORTCODE VALUE:", process.env.BUSINESS_SHORTCODE);
+console.log("🔍 ALL ENV KEYS:", Object.keys(process.env).filter(k => !k.includes('npm')));
 
 // 🔐 ACCESS TOKEN
 async function getAccessToken() {
