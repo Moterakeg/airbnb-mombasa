@@ -7,7 +7,7 @@ const axios = require("axios");
     console.log("📡 Sending request...");
 
     const res = await axios.post("https://mpesa-backend-rakq.onrender.com/stkpush", {
-      phone: "254746038656",
+      phone: "254769085318",
       amount: 4500,
       reference: "TEST123"
     });
