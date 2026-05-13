@@ -1,551 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Airbnb Mombasa — Coastal Living, Redefined</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<style>
-  :root{
-    --ocean:#1A9ACC;--ocean-mid:#2AAFBE;--teal:#2AAFBE;--teal-light:rgba(42,175,190,0.15);
-    --sand:#111111;--coral:#E8614A;--white:#0A0A0A;--charcoal:#EAEAEA;
-    --muted:#8A9FAA;--border:#242424;--card:#141414;
-    --green:#00A650;--green-light:rgba(0,166,80,0.12);
-    --red:#E05A5A;--red-light:rgba(224,90,90,0.1);
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
-  body{font-family:'Outfit',sans-serif;background:#0A0A0A;color:var(--charcoal);}
-  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:16px 5%;background:rgba(10,10,10,0.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
-  .logo{display:flex;align-items:center;gap:10px;}
-  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--ocean),var(--teal));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
-  .logo-text{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:#EAEAEA;}
-  .logo-text span{color:var(--coral);}
-  .nav-links{display:flex;gap:24px;align-items:center;}
-  .nav-links a{text-decoration:none;color:#8A9FAA;font-size:0.88rem;font-weight:500;transition:color 0.2s;}
-  .nav-links a:hover{color:var(--ocean);}
-  .nav-cta{background:var(--coral);color:#fff!important;padding:8px 20px;border-radius:50px;}
-  .hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:100px 5% 60px;gap:50px;background-image:url('room1.jpeg');background-size:cover;background-position:center;position:relative;overflow:hidden;}
-  .hero::before{content:'';position:absolute;inset:0;background:linear-gradient(100deg,rgba(5,25,40,0.82) 0%,rgba(5,25,40,0.60) 55%,rgba(5,25,40,0.30) 100%);z-index:0;}
-  .hero>*{position:relative;z-index:1;}
-  .hero-circle{display:none;}
-  .hero-content{animation:up 0.8s ease both;}
-  .hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(42,175,190,0.25);color:#7FD8E8;border:1px solid rgba(42,175,190,0.4);font-size:0.73rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:6px 14px;border-radius:50px;margin-bottom:20px;}
-  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,4vw,3.6rem);line-height:1.1;font-weight:700;margin-bottom:16px;color:#fff;}
-  .hero h1 em{font-style:italic;color:var(--teal);}
-  .hero p{color:rgba(255,255,255,0.75);font-size:1rem;line-height:1.75;max-width:440px;margin-bottom:30px;}
-  .hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
-  .btn-p{background:var(--coral);color:#fff;padding:13px 28px;border-radius:50px;text-decoration:none;font-weight:600;font-size:0.88rem;box-shadow:0 4px 16px rgba(232,97,74,0.35);transition:all 0.2s;}
-  .btn-p:hover{background:#C04030;transform:translateY(-1px);}
-  .btn-o{border:2px solid rgba(255,255,255,0.7);color:#fff;padding:13px 28px;border-radius:50px;text-decoration:none;font-weight:600;font-size:0.88rem;transition:all 0.2s;}
-  .btn-o:hover{background:#fff;color:var(--ocean);}
-  .hero-stats{display:flex;gap:28px;margin-top:36px;padding-top:28px;border-top:1px solid rgba(255,255,255,0.2);}
-  .hstat-num{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:#fff;}
-  .hstat-lbl{font-size:0.72rem;color:rgba(255,255,255,0.55);}
-  .hstat-num{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:var(--ocean);}
-  .hstat-lbl{font-size:0.72rem;color:var(--muted);}
-  .hero-photos{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:200px 150px;gap:10px;filter:drop-shadow(0 8px 32px rgba(0,0,0,0.4));}
-  .hp{border-radius:16px;overflow:hidden;position:relative;background:linear-gradient(135deg,#C0DBE8,#98BFD2);}
-  .hp:first-child{grid-row:1/3;border-radius:20px;}
-  .hp img{width:100%;height:100%;object-fit:cover;}
-  section{padding:80px 5%;}
-  .sh{text-align:center;margin-bottom:52px;}
-  .slabel{font-size:0.72rem;font-weight:600;letter-spacing:0.13em;text-transform:uppercase;color:var(--teal);margin-bottom:10px;}
-  .stitle{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3vw,2.5rem);font-weight:700;color:var(--charcoal);margin-bottom:12px;}
-  .ssub{color:var(--muted);font-size:0.94rem;line-height:1.7;max-width:460px;margin:0 auto;}
-  .rooms-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:26px;}
-  .rc{background:var(--card);border-radius:22px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 14px rgba(10,79,110,0.06);transition:transform 0.3s,box-shadow 0.3s;}
-  .rc:hover{transform:translateY(-5px);box-shadow:0 12px 36px rgba(10,79,110,0.12);}
-  .rc-imgs{height:210px;position:relative;background:#C0DBE8;}
-  .rpg{display:grid;grid-template-columns:3fr 2fr;grid-template-rows:1fr 1fr;height:100%;gap:2px;}
-  .rps{background:linear-gradient(135deg,#C0DBE8,#98BFD2);position:relative;overflow:hidden;}
-  .rps:first-child{grid-row:1/3;}
-  .rps img{width:100%;height:100%;object-fit:cover;}
-  .rbadge{position:absolute;top:12px;left:12px;z-index:3;background:var(--ocean);color:#fff;font-size:0.67rem;font-weight:600;padding:4px 11px;border-radius:50px;}
-  .rc-body{padding:20px;}
-  .rc-name{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:600;margin-bottom:10px;}
-  .rc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
-  .rtag{background:var(--teal-light);color:var(--ocean-mid);font-size:0.68rem;padding:3px 9px;border-radius:50px;}
-  .rc-foot{display:flex;justify-content:space-between;align-items:center;}
-  .rc-price{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--coral);}
-  .rc-price span{font-family:'Outfit',sans-serif;font-size:0.74rem;color:var(--muted);font-weight:400;}
-  .rbtn{background:var(--ocean);color:#fff;border:none;padding:9px 18px;border-radius:50px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s;}
-  .rbtn:hover{background:var(--teal);}
-  .am-bg{background:linear-gradient(135deg,#0A4F6E,#1A7A9A);color:#fff;}
-  .am-bg .stitle{color:#fff;}.am-bg .slabel{color:var(--teal);}.am-bg .ssub{color:rgba(255,255,255,0.55);}
-  .am-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:18px;}
-  .amc{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:26px 18px;text-align:center;transition:background 0.2s;}
-  .amc:hover{background:rgba(255,255,255,0.12);}
-  .amc-icon{font-size:1.7rem;margin-bottom:10px;}
-  .amc h4{color:#fff;font-size:0.88rem;font-weight:600;margin-bottom:4px;}
-  .amc p{color:rgba(255,255,255,0.45);font-size:0.73rem;}
-  .book-bg{background:var(--sand);}
-  .book-wrap{display:grid;grid-template-columns:1.1fr 1fr;gap:36px;max-width:980px;margin:0 auto;}
-  .bform{background:var(--card);border-radius:24px;padding:34px;border:1px solid var(--border);box-shadow:0 4px 22px rgba(10,79,110,0.08);}
-  .fg2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  .fg{display:flex;flex-direction:column;gap:6px;}
-  .fg.full{grid-column:1/3;}
-  .fg label{font-size:0.7rem;font-weight:600;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;}
-  .fg input,.fg select{border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-family:'Outfit',sans-serif;font-size:0.88rem;color:var(--charcoal);background:#1A1A1A;outline:none;transition:border-color 0.2s;}
-  .fg input:focus,.fg select:focus{border-color:var(--teal);}
-  .fg input::placeholder{color:#bbb;}
-  .fsub{width:100%;margin-top:14px;background:var(--green);color:#fff;border:none;padding:15px;border-radius:50px;font-size:0.92rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s;box-shadow:0 4px 14px rgba(0,166,80,0.3);}
-  .fsub:hover:not(:disabled){background:#008C44;transform:translateY(-1px);}
-  .fsub:disabled{opacity:0.65;cursor:not-allowed;}
-  .side-panel{display:flex;flex-direction:column;gap:18px;}
-  .scard{background:var(--card);border-radius:20px;padding:26px;border:1px solid var(--border);}
-  .scard h4{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--charcoal);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
-  .srow{display:flex;justify-content:space-between;font-size:0.84rem;color:var(--muted);padding:4px 0;}
-  .stotal{font-weight:700;color:var(--charcoal);font-size:0.96rem;border-top:1px solid var(--border);padding-top:10px;margin-top:8px;}
-  .sempty{color:var(--muted);font-size:0.82rem;text-align:center;padding:16px 0;opacity:0.6;}
-  .mpesa-card{background:var(--card);border-radius:20px;padding:26px;border:2px solid var(--green);}
-  .mph{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
-  .mpl{background:var(--green);color:#fff;width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;}
-  .mpt{font-weight:700;color:var(--charcoal);font-size:0.96rem;}
-  .mps{font-size:0.73rem;color:var(--muted);}
-  .mpsteps{display:flex;flex-direction:column;gap:9px;}
-  .mpstep{display:flex;align-items:flex-start;gap:10px;font-size:0.81rem;color:var(--charcoal);}
-  .mpstep-n{background:var(--green);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.63rem;font-weight:700;flex-shrink:0;margin-top:1px;}
-  .mpnote{background:#1E1208;border-left:3px solid var(--coral);padding:10px 12px;border-radius:0 8px 8px 0;font-size:0.76rem;color:var(--charcoal);line-height:1.5;margin-top:12px;}
-  .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
-  .modal-ov.on{display:flex;}
-  .mbox{background:#141414;border-radius:26px;max-width:460px;width:92%;animation:pop 0.28s ease both;overflow:hidden;}
-  .mtop{background:linear-gradient(135deg,var(--ocean),var(--teal));padding:30px;text-align:center;color:#fff;}
-  .mtop-err{background:linear-gradient(135deg,#C05050,var(--red));}
-  .mtop .mi{font-size:2.8rem;margin-bottom:10px;}
-  .mtop h3{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:5px;}
-  .mtop p{opacity:0.8;font-size:0.84rem;}
-  .mbody{padding:26px;}
-  .mref-box{background:var(--sand);border-radius:10px;padding:11px 16px;text-align:center;font-family:monospace;font-size:0.98rem;color:var(--coral);font-weight:700;margin-bottom:16px;}
-  .mtotal-line{text-align:center;margin:12px 0;font-size:0.88rem;color:var(--muted);}
-  .mtotal-line strong{font-size:1.35rem;color:var(--charcoal);font-family:'Playfair Display',serif;}
-  .mpbox{background:var(--green-light);border:1.5px solid var(--green);border-radius:14px;padding:18px;}
-  .mpbox h4{color:var(--green);font-size:0.84rem;font-weight:700;margin-bottom:10px;}
-  .pstep{font-size:0.8rem;color:var(--charcoal);padding:4px 0;display:flex;gap:9px;align-items:flex-start;}
-  .psn{background:var(--green);color:#fff;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;flex-shrink:0;margin-top:1px;}
-  .poll-box{margin-top:14px;padding:12px 16px;border-radius:12px;text-align:center;font-size:0.84rem;font-weight:600;}
-  .poll-waiting{background:#2A1E00;color:#E8A040;}
-  .poll-success{background:var(--green-light);color:var(--green);}
-  .poll-failed{background:var(--red-light);color:var(--red);}
-  /* SMS VERIFY BOX */
-  .sms-box{margin-top:14px;background:#F7FAFB;border:1.5px dashed var(--border);border-radius:14px;padding:16px;}
-  .sms-label{font-size:0.78rem;color:var(--muted);margin-bottom:8px;font-weight:500;}
-  .sms-input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-family:'Outfit',sans-serif;font-size:0.8rem;color:var(--charcoal);resize:vertical;min-height:70px;outline:none;transition:border-color 0.2s;}
-  .sms-input:focus{border-color:var(--teal);}
-  .sms-btn{width:100%;margin-top:8px;background:var(--green);color:#fff;border:none;padding:11px;border-radius:50px;font-size:0.84rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:background 0.2s;}
-  .sms-btn:hover{background:#008C44;}
-  .sms-result{margin-top:8px;padding:10px 14px;border-radius:10px;font-size:0.8rem;font-weight:600;display:none;}
-  .sms-ok{background:var(--green-light);color:var(--green);border:1px solid var(--green);}
-  .sms-fail{background:var(--red-light);color:var(--red);border:1px solid var(--red);}
-  .mcls{width:100%;background:var(--charcoal);color:#fff;border:none;padding:12px;border-radius:50px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:0.88rem;font-weight:600;margin-top:14px;}
-  footer{background:#050505;color:rgba(255,255,255,0.4);text-align:center;padding:40px 5%;border-top:1px solid var(--border);}
-  footer .ftlogo{font-family:'Playfair Display',serif;font-size:1.3rem;color:#fff;margin-bottom:8px;}
-  footer a{color:var(--teal);text-decoration:none;}
-  footer p{font-size:0.82rem;margin-top:5px;}
-  @keyframes up{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:translateY(0);}}
-  @keyframes pop{from{opacity:0;transform:scale(0.88);}to{opacity:1;transform:scale(1);}}
-  @media(max-width:768px){.hero{grid-template-columns:1fr;padding-top:90px;}.hero-photos{display:none;}.book-wrap{grid-template-columns:1fr;}.fg2{grid-template-columns:1fr;}.fg.full{grid-column:1;}.nav-links{display:none;}}
-</style>
-</head>
-<body>
+# Fixed HTML Section
 
-<nav>
-  <div class="logo" id="logo-secret" onclick="secretClick()" style="cursor:pointer;">
-    <div class="logo-icon">🌊</div>
-    <div class="logo-text">Airbnb <span>Mombasa</span></div>
-  </div>
-  <div class="nav-links">
-    <a href="#rooms">Rooms</a>
-    <a href="#amenities">Amenities</a>
-    <a href="#book">Book Now</a>
-  </div>
-</nav>
+Replace the broken form section in your `index.html` with this corrected version:
 
-<section class="hero">
-  <div class="hero-circle"></div>
-  <div class="hero-content">
-    <div class="hero-tag">🌴 Mombasa, Bamburi</div>
-    <h1>Your Coastal <em>Escape</em> Awaits</h1>
-    <p>Premium serviced apartments with warm Swahili hospitality, modern comfort, and the sound of the Indian Ocean — every single night.</p>
-    <div class="hero-btns">
-      <a href="#book" class="btn-p">Book Your Stay</a>
-      <a href="#rooms" class="btn-o">View Rooms</a>
-    </div>
-    <div class="hero-stats">
-      <div><div class="hstat-num">3</div><div class="hstat-lbl">Room Types</div></div>
-      <div><div class="hstat-num">24/7</div><div class="hstat-lbl">Support</div></div>
-      <div><div class="hstat-num">M-Pesa</div><div class="hstat-lbl">STK Push</div></div>
-    </div>
+```html
+<div class="fg2">
+  <div class="fg">
+    <label>Full Name</label>
+    <input id="fn" type="text" placeholder="e.g. Amina Salim"/>
   </div>
-  <div class="hero-photos">
-    <div class="hp"><img src="room1.jpeg" alt="Room" onerror="this.style.display='none'"></div>
-    <div class="hp"><img src="room2.jpeg" alt="Room" onerror="this.style.display='none'"></div>
-    <div class="hp"><img src="room3.jpeg" alt="Room" onerror="this.style.display='none'"></div>
-  </div>
-</section>
 
-<section id="rooms">
-  <div class="sh">
-    <div class="slabel">Our Rooms</div>
-    <div class="stitle">Choose Your Space</div>
-    <p class="ssub">Every unit is fully furnished, serviced, and steps from the Mombasa coast.</p>
+  <div class="fg">
+    <label>M-Pesa Phone Number</label>
+    <input id="fp" type="tel" placeholder="07XX XXX XXX"/>
   </div>
-  <div class="rooms-grid">
-    <div class="rc">
-      <div class="rc-imgs"><div class="rbadge">Studio</div>
-        <div class="rpg">
-          <div class="rps"><img src="room1.jpeg" alt="" onerror="this.style.display='none'"></div>
-          <div class="rps"><img src="room2.jpeg" alt="" onerror="this.style.display='none'"></div>
-          <div class="rps"><img src="room3.jpeg" alt="" onerror="this.style.display='none'"></div>
-        </div>
-      </div>
-      <div class="rc-body">
-        <div class="rc-name">Studio Apartment</div>
-        <div class="rc-tags"><span class="rtag">🛏 Double Bed</span><span class="rtag">🚿 En-suite</span><span class="rtag">📺 Smart TV</span><span class="rtag">☕ Kitchenette</span><span class="rtag">📶 Wi-Fi</span></div>
-        <div class="rc-foot"><div class="rc-price">KSh 2,500 <span>/ night</span></div><button class="rbtn" onclick="goBook('Studio Apartment','2500')">Book Now</button></div>
-      </div>
-    </div>
-    <div class="rc">
-      <div class="rc-imgs"><div class="rbadge">1 Bedroom</div>
-        <div class="rpg">
-          <div class="rps"><img src="room4.jpeg" alt="" onerror="this.style.display='none'"></div>
-          <div class="rps"><img src="room5.jpeg" alt="" onerror="this.style.display='none'"></div>
-          <div class="rps"><img src="room6.jpeg" alt="" onerror="this.style.display='none'"></div>
-        </div>
-      </div>
-      <div class="rc-body">
-        <div class="rc-name">1 Bedroom Apartment</div>
-        <div class="rc-tags"><span class="rtag">🛏 King Bed</span><span class="rtag">🛁 En-suite</span><span class="rtag">🛋 Lounge</span><span class="rtag">🍳 Full Kitchen</span><span class="rtag">📶 Wi-Fi</span><span class="rtag">🅿 Parking</span></div>
-        <div class="rc-foot"><div class="rc-price">KSh 3,500 <span>/ night</span></div><button class="rbtn" onclick="goBook('1 Bedroom Apartment','3500')">Book Now</button></div>
-      </div>
-    </div>
-    <div class="rc">
-      <div class="rc-imgs"><div class="rbadge">2 Bedroom</div>
-        <div class="rpg">
-          <div class="rps"><img src="room7.jpeg" alt="" onerror="this.style.display='none'"></div>
-          <div class="rps"><img src="room8.jpeg" alt="" onerror="this.style.display='none'"></div>
-          <div class="rps"><img src="room9.jpeg" alt="" onerror="this.style.display='none'"></div>
-        </div>
-      </div>
-      <div class="rc-body">
-        <div class="rc-name">2 Bedroom Family Suite</div>
-        <div class="rc-tags"><span class="rtag">🛏 2 Bedrooms</span><span class="rtag">🛁 2 Bathrooms</span><span class="rtag">🛋 Living Room</span><span class="rtag">🍳 Kitchen</span><span class="rtag">📶 Wi-Fi</span><span class="rtag">🍽 Dining</span></div>
-        <div class="rc-foot"><div class="rc-price">KSh 5,500 <span>/ night</span></div><button class="rbtn" onclick="goBook('2 Bedroom Suite','5500')">Book Now</button></div>
-      </div>
-    </div>
+
+  <div class="fg">
+    <label>Email Address</label>
+    <input id="fe" type="email" placeholder="e.g. you@example.com"/>
   </div>
-</section>
 
-<section id="amenities" class="am-bg">
-  <div class="sh">
-    <div class="slabel">Included</div>
-    <div class="stitle">Everything You Need</div>
-    <p class="ssub">All units come fully equipped for a seamless coastal stay.</p>
+  <div class="fg">
+    <label>National ID / Passport</label>
+    <input id="fi" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="National ID or Passport"/>
   </div>
-  <div class="am-grid">
-    <div class="amc"><div class="amc-icon">🌊</div><h4>Ocean Proximity</h4><p>Steps from the Indian Ocean</p></div>
-    <div class="amc"><div class="amc-icon">📶</div><h4>Fast Wi-Fi</h4><p>Fibre connection throughout</p></div>
-    <div class="amc"><div class="amc-icon">🔒</div><h4>24/7 Security</h4><p>Gated compound with CCTV</p></div>
-    <div class="amc"><div class="amc-icon">🧹</div><h4>Housekeeping</h4><p>Daily cleaning on request</p></div>
-    <div class="amc"><div class="amc-icon">🔌</div><h4>Backup Power</h4><p>Generator — no blackouts</p></div>
-    <div class="amc"><div class="amc-icon">🅿</div><h4>Free Parking</h4><p>Secure parking for guests</p></div>
+
+  <div class="fg full">
+    <label>Room Type</label>
+    <select id="fr" onchange="upd()">
+      <option value="">— Select a Room —</option>
+      <option value="Studio Apartment|2500">Studio Apartment — KSh 2,500/night</option>
+      <option value="1 Bedroom Apartment|3500">1 Bedroom Apartment — KSh 3,500/night</option>
+      <option value="2 Bedroom Suite|5500">2 Bedroom Suite — KSh 5,500/night</option>
+    </select>
   </div>
-</section>
 
-<section id="book" class="book-bg">
-  <div class="sh">
-    <div class="slabel">Reservations</div>
-    <div class="stitle">Book Your Stay</div>
-    <p class="ssub">Fill in the form — M-Pesa PIN prompt is sent instantly to your phone.</p>
+  <div class="fg">
+    <label>Check-in Date</label>
+    <input id="fci" type="date" onchange="upd()"/>
   </div>
-  <div class="book-wrap">
-    <div class="bform">
-      <div class="fg2">
-        <div class="fg"><label>Full Name</label><input id="fn" type="text" placeholder="e.g. Amina Salim"/></div>
-        <div class="fg"><label>M-Pesa Phone Number</label><input id="fp" type="tel" placeholder="07XX XXX XXX"/></div>
-        <div class="fg"><label>Email Address</label><input id="fe" type="email" 
-<input id="fi" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="National ID or Passport"/>
-        <div class="fg full"><label>Room Type</label>
-          <select id="fr" onchange="upd()">
-            <option value="">— Select a Room —</option>
-            <option value="Studio Apartment|2500">Studio Apartment — KSh 2,500/night</option>
-            <option value="1 Bedroom Apartment|3500">1 Bedroom Apartment — KSh 3,500/night</option>
-            <option value="2 Bedroom Suite|5500">2 Bedroom Suite — KSh 5,500/night</option>
-          </select>
-        </div>
-        <div class="fg"><label>Check-in Date</label><input id="fci" type="date" onchange="upd()"/></div>
-        <div class="fg"><label>Check-out Date</label><input id="fco" type="date" onchange="upd()"/></div>
-        <div class="fg"><label>Number of Guests</label>
-          <select id="fguests"><option>1 Guest</option><option>2 Guests</option><option>3 Guests</option><option>4 Guests</option><option>5+ Guests</option></select>
-        </div>
-      </div>
-      <button class="fsub" id="bookBtn" onclick="doBooking()">💚 Pay with M-Pesa (STK Push)</button>
-    </div>
-    <div class="side-panel">
-      <div class="scard">
-        <h4>📋 Booking Summary</h4>
-        <div id="sbody"><div class="sempty">Select a room and dates to see your total.</div></div>
-      </div>
-      <div class="mpesa-card">
-        <div class="mph"><div class="mpl">M</div><div><div class="mpt">M-Pesa STK Push</div><div class="mps">Instant PIN prompt on your phone</div></div></div>
-        <div class="mpsteps">
-          <div class="mpstep"><div class="mpstep-n">1</div><div>Fill in the booking form above</div></div>
-          <div class="mpstep"><div class="mpstep-n">2</div><div>Click <strong>"Pay with M-Pesa"</strong></div></div>
-          <div class="mpstep"><div class="mpstep-n">3</div><div>M-Pesa PIN prompt appears on your phone</div></div>
-          <div class="mpstep"><div class="mpstep-n">4</div><div>Enter your PIN — booking is confirmed ✅</div></div>
-        </div>
-        <div class="mpnote">⚠️ The phone number you enter must be your M-Pesa registered number.</div>
-      </div>
-    </div>
+
+  <div class="fg">
+    <label>Check-out Date</label>
+    <input id="fco" type="date" onchange="upd()"/>
   </div>
-</section>
 
-<footer>
-  <div class="ftlogo">Airbnb Mombasa</div>
-  <p>Mombasa, Kenya &nbsp;|&nbsp; <a href="tel:+254769085318">0769 085 318</a></p>
-</footer>
-
-<!-- SUCCESS MODAL -->
-<div class="modal-ov" id="modal-success">
-  <div class="mbox">
-    <div class="mtop"><div class="mi">📱</div><h3>Check Your Phone!</h3><p>M-Pesa PIN prompt sent. Enter your PIN to complete.</p></div>
-    <div class="mbody">
-      <div class="mref-box" id="mref">REF: #AM-000000</div>
-      <div class="mtotal-line">Amount: <strong id="mtotal">KSh 0</strong></div>
-      <div class="mpbox">
-        <h4>📲 Complete Payment on Your Phone</h4>
-        <div class="pstep"><div class="psn">1</div><span>Check your phone for M-Pesa PIN prompt</span></div>
-        <div class="pstep"><div class="psn">2</div><span>Enter your <strong>M-Pesa PIN</strong> to pay</span></div>
-        <div class="pstep"><div class="psn">3</div><span>Once paid, paste your <strong>M-Pesa SMS</strong> below</span></div>
-      </div>
-      <div class="poll-box poll-waiting" id="poll-box">⏳ Waiting for payment confirmation...</div>
-
-      <!-- M-PESA SMS PASTE BOX -->
-      <div class="sms-box" id="sms-box">
-        <div class="sms-label">📩 Received your M-Pesa SMS? Paste it here to confirm instantly:</div>
-        <textarea id="sms-input" class="sms-input" placeholder="e.g. QKL4XXXXX Confirmed. Ksh2,500.00 sent to AIRBNB MOMBASA on 11/4/25..."></textarea>
-        <button class="sms-btn" onclick="verifySMS()">✅ Verify M-Pesa Payment</button>
-        <div class="sms-result" id="sms-result"></div>
-      </div>
-
-      <button class="mcls" onclick="closeModal()">Close</button>
-    </div>
+  <div class="fg">
+    <label>Number of Guests</label>
+    <select id="fguests">
+      <option>1 Guest</option>
+      <option>2 Guests</option>
+      <option>3 Guests</option>
+      <option>4 Guests</option>
+      <option>5+ Guests</option>
+    </select>
   </div>
 </div>
+```
 
-<!-- ERROR MODAL -->
-<div class="modal-ov" id="modal-error">
-  <div class="mbox">
-    <div class="mtop mtop-err"><div class="mi">❌</div><h3>Payment Failed</h3><p id="err-msg">Something went wrong. Please try again.</p></div>
-    <div class="mbody">
-      <p style="font-size:0.86rem;color:var(--muted);margin-bottom:16px;line-height:1.6;">Common causes: wrong PIN entered, insufficient M-Pesa balance, or request was cancelled. Please try again.</p>
-      <button class="mcls" style="background:var(--coral);" onclick="document.getElementById('modal-error').classList.remove('on')">Try Again</button>
-    </div>
-  </div>
-</div>
+After replacing it:
 
-<script>
-  const BACKEND = 'https://mpesa-backend-rakq.onrender.com';
-  let pollInterval = null;
-  let currentRef = null;
-  let currentAmount = 0;
+1. Save the file
+2. Push to GitHub
+3. In Render → Manual Deploy → Clear build cache & deploy
 
-  // ── SECRET ADMIN ACCESS: click logo 5 times ──
-  let logoClicks = 0, logoTimer = null;
-  function secretClick() {
-    logoClicks++;
-    clearTimeout(logoTimer);
-    if (logoClicks >= 5) {
-      logoClicks = 0;
-      const pw = prompt('🔐 Admin Password:');
-      if (pw === 'Zack145.chacha') { // ← change this password
-        window.location.href = 'airbnb.html';
-      } else if (pw !== null) {
-        alert('Wrong password.');
-      }
-    } else {
-      logoTimer = setTimeout(() => logoClicks = 0, 2000);
-    }
-  }
-
-  function goBook(room, price) {
-    const sel = document.getElementById('fr');
-    for (let o of sel.options) { if (o.value.startsWith(room)) { sel.value = o.value; break; } }
-    upd();
-    document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
-  }
-
-  function fd(d) {
-    if (!d) return '—';
-    const [y,m,day] = d.split('-');
-    const mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return `${day} ${mn[parseInt(m)-1]} ${y}`;
-  }
-
-  function upd() {
-    const rv = document.getElementById('fr').value;
-    const ci = document.getElementById('fci').value;
-    const co = document.getElementById('fco').value;
-    const b  = document.getElementById('sbody');
-    if (!rv || !ci || !co) { b.innerHTML = '<div class="sempty">Select a room and dates to see your total.</div>'; return; }
-    const [rn, rate] = rv.split('|');
-    const n = Math.max(1, Math.round((new Date(co) - new Date(ci)) / 864e5));
-    if (n <= 0) { b.innerHTML = '<div class="sempty">Check-out must be after check-in.</div>'; return; }
-    const t = n * parseInt(rate);
-    b.innerHTML = `
-      <div class="srow"><span>Room</span><span>${rn}</span></div>
-      <div class="srow"><span>Check-in</span><span>${fd(ci)}</span></div>
-      <div class="srow"><span>Check-out</span><span>${fd(co)}</span></div>
-      <div class="srow"><span>Duration</span><span>${n} night${n>1?'s':''}</span></div>
-      <div class="srow"><span>Rate/Night</span><span>KSh ${parseInt(rate).toLocaleString()}</span></div>
-      <div class="srow stotal"><span>Total</span><span>KSh ${t.toLocaleString()}</span></div>`;
-  }
-
-  async function doBooking() {
-    const name   = document.getElementById('fn').value.trim();
-    const phone  = document.getElementById('fp').value.trim();
-    const email  = document.getElementById('fe').value.trim();
-    const idNo   = document.getElementById('fi').value.trim();
-    const rv     = document.getElementById('fr').value;
-    const guests = document.getElementById('fguests').value;
-    const ci     = document.getElementById('fci').value;
-    const co     = document.getElementById('fco').value;
-
-    if (!name || !phone || !idNo || !rv || !ci || !co) { alert('Please fill in all required fields.'); return; }
-    if (new Date(co) <= new Date(ci)) { alert('Check-out date must be after check-in date.'); return; }
-
-    const [rn, rate] = rv.split('|');
-    const nights = Math.round((new Date(co) - new Date(ci)) / 864e5);
-    const total  = nights * parseInt(rate);
-    const ref    = 'AM-' + Date.now().toString().slice(-6);
-
-    const guestData = { ref, name, phone, email, idNo, roomName: rn, rate: parseInt(rate), guests, checkin: ci, checkout: co, nights, total, status: 'Pending Payment', bookedAt: new Date().toISOString() };
-
-    const btn = document.getElementById('bookBtn');
-    btn.textContent = '⏳ Sending M-Pesa prompt...';
-    btn.disabled = true;
-
-    try {
-      const res = await fetch(`${BACKEND}/stkpush`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, amount: total, reference: ref, guestData })
-      });
-      const data = await res.json();
-
-      if (data.ResponseCode === '0') {
-        document.getElementById('mref').textContent   = 'REF: #' + ref;
-        document.getElementById('mtotal').textContent = 'KSh ' + total.toLocaleString();
-        currentRef = ref;
-        currentAmount = total;
-        // Reset SMS box
-        document.getElementById('sms-input').value = '';
-        document.getElementById('sms-result').style.display = 'none';
-        document.getElementById('sms-result').className = 'sms-result';
-        setPollStatus('waiting', '⏳ Waiting for payment confirmation...');
-        document.getElementById('modal-success').classList.add('on');
-        ['fn','fp','fe','fi','fci','fco'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('fr').value = '';
-        document.getElementById('sbody').innerHTML = '<div class="sempty">Select a room and dates to see your total.</div>';
-        startPolling(ref);
-      } else {
-        showError(data.errorMessage || 'M-Pesa request failed. Please try again.');
-      }
-    } catch (err) {
-      showError('Could not reach the payment server. Make sure the backend is running.');
-      console.error(err);
-    } finally {
-      btn.textContent = '💚 Pay with M-Pesa easy and reliable';
-      btn.disabled = false;
-    }
-  }
-
-  function startPolling(ref) {
-    if (pollInterval) clearInterval(pollInterval);
-    let attempts = 0;
-    pollInterval = setInterval(async () => {
-      attempts++;
-      try {
-        const res = await fetch(`${BACKEND}/bookings`);
-        const bookings = await res.json();
-        const bk = bookings.find(b => b.ref === ref);
-        if (bk?.status === 'Confirmed') {
-          clearInterval(pollInterval);
-          setPollStatus('success', '✅ Payment confirmed! Booking complete. We\'ll call you shortly.');
-        } else if (bk?.status === 'Payment Failed') {
-          clearInterval(pollInterval);
-          setPollStatus('failed', '❌ Payment was cancelled or failed. Please try again.');
-        } else if (attempts >= 15) {
-          clearInterval(pollInterval);
-          setPollStatus('failed', '⏰ Timed out. Check your M-Pesa SMS — if paid, we\'ll confirm via call.');
-        }
-      } catch(e) {}
-    }, 4000);
-  }
-
-  function setPollStatus(type, msg) {
-    const el = document.getElementById('poll-box');
-    el.className = 'poll-box poll-' + type;
-    el.textContent = msg;
-  }
-
-  function showError(msg) {
-    document.getElementById('err-msg').textContent = msg;
-    document.getElementById('modal-error').classList.add('on');
-  }
-
-  // ── PARSE & VERIFY M-PESA SMS ──
-  async function verifySMS() {
-    const sms = document.getElementById('sms-input').value.trim();
-    const resultEl = document.getElementById('sms-result');
-    if (!sms) { alert('Please paste your M-Pesa SMS first.'); return; }
-
-    // Parse M-Pesa SMS — typical format:
-    // "QKL4XXXXX Confirmed. Ksh2,500.00 sent to NAME on 11/4/25..."
-    const receiptMatch = sms.match(/([A-Z0-9]{10,12})\s+Confirmed/i);
-    const amountMatch  = sms.match(/Ksh\s?([\d,]+\.?\d*)/i);
-
-    if (!receiptMatch) {
-      resultEl.className = 'sms-result sms-fail';
-      resultEl.style.display = 'block';
-      resultEl.textContent = '❌ Could not read receipt number. Make sure you pasted the full M-Pesa SMS.';
-      return;
-    }
-
-    const receiptNo = receiptMatch[1];
-    const paidAmt   = amountMatch ? parseFloat(amountMatch[1].replace(',','')) : 0;
-
-    // Check amount matches
-    if (paidAmt && paidAmt < currentAmount) {
-      resultEl.className = 'sms-result sms-fail';
-      resultEl.style.display = 'block';
-      resultEl.textContent = `❌ Amount mismatch. Expected KSh ${currentAmount.toLocaleString()} but SMS shows KSh ${paidAmt.toLocaleString()}. Please contact us.`;
-      return;
-    }
-
-    // Send to backend to record
-    try {
-      await fetch(`${BACKEND}/verify-sms`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ref: currentRef, receiptNo, paidAmt, smsText: sms })
-      });
-    } catch(e) { /* backend offline — still show success to user */ }
-
-    resultEl.className = 'sms-result sms-ok';
-    resultEl.style.display = 'block';
-    resultEl.textContent = `✅ Payment verified! Receipt: ${receiptNo} — KSh ${paidAmt.toLocaleString()}. We'll confirm your booking shortly.`;
-    setPollStatus('success', '✅ Payment confirmed via SMS! We\'ll call you to finalise check-in.');
-    if (pollInterval) clearInterval(pollInterval);
-  }
-
-  function closeModal() {
-    document.getElementById('modal-success').classList.remove('on');
-    if (pollInterval) clearInterval(pollInterval);
-  }
-
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('fci').min = today;
-  document.getElementById('fco').min = today;
-</script>
-</body>
-</html>
+Your Pay button validation and JavaScript should start working agai
