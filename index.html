@@ -1,66 +1,120 @@
-# Fixed HTML Section
+# Full Corrected Booking Form HTML
 
-Replace the broken form section in your `index.html` with this corrected version:
+Replace your current broken booking form section with this complete corrected version:
 
 ```html
-<div class="fg2">
-  <div class="fg">
-    <label>Full Name</label>
-    <input id="fn" type="text" placeholder="e.g. Amina Salim"/>
+<section id="book" class="book-bg">
+  <div class="sh">
+    <div class="slabel">Reservations</div>
+    <div class="stitle">Book Your Stay</div>
+    <p class="ssub">Fill in the form — M-Pesa PIN prompt is sent instantly to your phone.</p>
   </div>
 
-  <div class="fg">
-    <label>M-Pesa Phone Number</label>
-    <input id="fp" type="tel" placeholder="07XX XXX XXX"/>
-  </div>
+  <div class="book-wrap">
+    <div class="bform">
+      <div class="fg2">
 
-  <div class="fg">
-    <label>Email Address</label>
-    <input id="fe" type="email" placeholder="e.g. you@example.com"/>
-  </div>
+        <div class="fg">
+          <label>Full Name</label>
+          <input id="fn" type="text" placeholder="e.g. Amina Salim"/>
+        </div>
 
-  <div class="fg">
-    <label>National ID / Passport</label>
-    <input id="fi" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="National ID or Passport"/>
-  </div>
+        <div class="fg">
+          <label>M-Pesa Phone Number</label>
+          <input id="fp" type="tel" placeholder="07XX XXX XXX"/>
+        </div>
 
-  <div class="fg full">
-    <label>Room Type</label>
-    <select id="fr" onchange="upd()">
-      <option value="">— Select a Room —</option>
-      <option value="Studio Apartment|2500">Studio Apartment — KSh 2,500/night</option>
-      <option value="1 Bedroom Apartment|3500">1 Bedroom Apartment — KSh 3,500/night</option>
-      <option value="2 Bedroom Suite|5500">2 Bedroom Suite — KSh 5,500/night</option>
-    </select>
-  </div>
+        <div class="fg">
+          <label>Email Address</label>
+          <input id="fe" type="email" placeholder="e.g. you@example.com"/>
+        </div>
 
-  <div class="fg">
-    <label>Check-in Date</label>
-    <input id="fci" type="date" onchange="upd()"/>
-  </div>
+        <div class="fg">
+          <label>National ID / Passport</label>
+          <input id="fi" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="National ID or Passport"/>
+        </div>
 
-  <div class="fg">
-    <label>Check-out Date</label>
-    <input id="fco" type="date" onchange="upd()"/>
-  </div>
+        <div class="fg full">
+          <label>Room Type</label>
+          <select id="fr" onchange="upd()">
+            <option value="">— Select a Room —</option>
+            <option value="Studio Apartment|2500">Studio Apartment — KSh 2,500/night</option>
+            <option value="1 Bedroom Apartment|3500">1 Bedroom Apartment — KSh 3,500/night</option>
+            <option value="2 Bedroom Suite|5500">2 Bedroom Suite — KSh 5,500/night</option>
+          </select>
+        </div>
 
-  <div class="fg">
-    <label>Number of Guests</label>
-    <select id="fguests">
-      <option>1 Guest</option>
-      <option>2 Guests</option>
-      <option>3 Guests</option>
-      <option>4 Guests</option>
-      <option>5+ Guests</option>
-    </select>
+        <div class="fg">
+          <label>Check-in Date</label>
+          <input id="fci" type="date" onchange="upd()"/>
+        </div>
+
+        <div class="fg">
+          <label>Check-out Date</label>
+          <input id="fco" type="date" onchange="upd()"/>
+        </div>
+
+        <div class="fg">
+          <label>Number of Guests</label>
+          <select id="fguests">
+            <option>1 Guest</option>
+            <option>2 Guests</option>
+            <option>3 Guests</option>
+            <option>4 Guests</option>
+            <option>5+ Guests</option>
+          </select>
+        </div>
+
+      </div>
+
+      <button class="fsub" id="bookBtn" onclick="doBooking()">
+        💚 Pay with M-Pesa (STK Push)
+      </button>
+    </div>
+
+    <div class="side-panel">
+      <div class="scard">
+        <h4>📋 Booking Summary</h4>
+        <div id="sbody">
+          <div class="sempty">Select a room and dates to see your total.</div>
+        </div>
+      </div>
+
+      <div class="mpesa-card">
+        <div class="mph">
+          <div class="mpl">M</div>
+          <div>
+            <div class="mpt">M-Pesa STK Push</div>
+            <div class="mps">Instant PIN prompt on your phone</div>
+          </div>
+        </div>
+
+        <div class="mpsteps">
+          <div class="mpstep"><div class="mpstep-n">1</div><div>Fill in the booking form above</div></div>
+          <div class="mpstep"><div class="mpstep-n">2</div><div>Click <strong>"Pay with M-Pesa"</strong></div></div>
+          <div class="mpstep"><div class="mpstep-n">3</div><div>M-Pesa PIN prompt appears on your phone</div></div>
+          <div class="mpstep"><div class="mpstep-n">4</div><div>Enter your PIN — booking is confirmed ✅</div></div>
+        </div>
+
+        <div class="mpnote">
+          ⚠️ The phone number you enter must be your M-Pesa registered number.
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</section>
 ```
 
-After replacing it:
+Main issue fixed:
 
-1. Save the file
+```html
+<input id="fe" type="email"
+```
+
+was missing the closing `>` which broke the rest of the form and stopped the Pay button JavaScript from working correctly.
+
+After replacing:
+
+1. Save `index.html`
 2. Push to GitHub
-3. In Render → Manual Deploy → Clear build cache & deploy
-
-Your Pay button validation and JavaScript should start working agai
+3. Render → Manual Deploy → Clear build cache & deploy
