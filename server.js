@@ -11,8 +11,10 @@ app.use(cors());
 app.use(express.static(__dirname));
 
 const PORT = process.env.PORT || 3000;
-const BOOKINGS_FILE = path.join(__dirname, "bookings.json");
-
+const booking = bookings.find(b =>
+  b.checkoutRequestId === result.CheckoutRequestID ||
+  b.checkoutRequestId === result.CheckoutRequestId
+);
 // ─── ENV CHECK ────────────────────────────────────────────────
 console.log("🔑 CONSUMER KEY:   ", process.env.CONSUMER_KEY ? "OK" : "MISSING");
 console.log("🔑 CONSUMER SECRET:", process.env.CONSUMER_SECRET ? "OK" : "MISSING");
