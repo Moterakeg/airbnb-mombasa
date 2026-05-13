@@ -11,10 +11,8 @@ app.use(cors());
 app.use(express.static(__dirname));
 
 const PORT = process.env.PORT || 3000;
-const booking = bookings.find(b =>
-  b.checkoutRequestId === result.CheckoutRequestID ||
-  b.checkoutRequestId === result.CheckoutRequestId
-);
+const BOOKINGS_FILE = path.join(__dirname, "bookings.json");
+
 // ─── ENV CHECK ────────────────────────────────────────────────
 console.log("🔑 CONSUMER KEY:   ", process.env.CONSUMER_KEY ? "OK" : "MISSING");
 console.log("🔑 CONSUMER SECRET:", process.env.CONSUMER_SECRET ? "OK" : "MISSING");
@@ -25,8 +23,11 @@ console.log("🔍 RAW SHORTCODE:  ", process.env.BUSINESS_SHORTCODE);
 // ─── BOOKING HELPERS ─────────────────────────────────────────
 function readBookings() {
   if (!fs.existsSync(BOOKINGS_FILE)) return [];
-  try { return JSON.parse(fs.readFileSync(BOOKINGS_FILE, "utf8")); }
-  catch { return []; }
+  try {
+    return JSON.parse(fs.readFileSync(BOOKINGS_FILE, "utf8"));
+  } catch {
+    return [];
+  }
 }
 
 function saveBookings(bookings) {
@@ -36,6 +37,7 @@ function saveBookings(bookings) {
 function updateBookingStatus(ref, status, extraData = {}) {
   const bookings = readBookings();
   const idx = bookings.findIndex(b => b.ref === ref);
+
   if (idx !== -1) {
     bookings[idx] = { ...bookings[idx], status, ...extraData };
     saveBookings(bookings);
@@ -49,10 +51,12 @@ async function getAccessToken() {
   const auth = Buffer.from(
     `${process.env.CONSUMER_KEY}:${process.env.CONSUMER_SECRET}`
   ).toString("base64");
+
   const response = await axios.get(
     "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
     { headers: { Authorization: "Basic " + auth } }
   );
+
   return response.data.access_token;
 }
 
@@ -61,18 +65,13 @@ function getTimestamp() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ROUTE: POST /stkpush
+// STK PUSH
 // ═══════════════════════════════════════════════════════════════
 app.post("/stkpush", async (req, res) => {
   console.log("\n🔥 STK ROUTE HIT");
-  console.log("📦 BODY:", req.body);
 
-  // ✅ FIXED: use BUSINESS_SHORTCODE everywhere
   const shortcode = process.env.BUSINESS_SHORTCODE;
-  const passkey   = process.env.PASSKEY;
-
-  console.log("🏦 SHORTCODE:", shortcode);
-  console.log("🔑 PASSKEY EXISTS:", !!passkey);
+  const passkey = process.env.PASSKEY;
 
   try {
     let { phone, amount, reference, guestData } = req.body;
@@ -81,27 +80,37 @@ app.post("/stkpush", async (req, res) => {
       return res.status(400).json({ error: "Phone and amount are required" });
     }
 
-    // Format phone → 254XXXXXXXXX
+    // format phone
     phone = phone.toString().trim();
     if (phone.startsWith("0")) phone = "254" + phone.substring(1);
     else if (phone.startsWith("+")) phone = phone.replace("+", "");
+
     console.log("📞 FORMATTED PHONE:", phone);
 
-    // Save booking
+    // save booking
     if (guestData) {
       const bookings = readBookings();
       const existing = bookings.findIndex(b => b.ref === guestData.ref);
-      if (existing === -1) bookings.push({ ...guestData, status: "Pending Payment" });
-      else bookings[existing] = { ...bookings[existing], ...guestData, status: "Pending Payment" };
+
+      if (existing === -1) {
+        bookings.push({ ...guestData, status: "Pending Payment" });
+      } else {
+        bookings[existing] = {
+          ...bookings[existing],
+          ...guestData,
+          status: "Pending Payment"
+        };
+      }
+
       saveBookings(bookings);
-      console.log("💾 Booking saved:", guestData.ref);
     }
 
     const token = await getAccessToken();
-    console.log("🔐 Token acquired");
-
     const timestamp = getTimestamp();
-    const password  = Buffer.from(shortcode + passkey + timestamp).toString("base64");
+
+    const password = Buffer.from(
+      shortcode + passkey + timestamp
+    ).toString("base64");
 
     const stkData = {
       BusinessShortCode: shortcode,
@@ -117,7 +126,6 @@ app.post("/stkpush", async (req, res) => {
       TransactionDesc: "Airbnb Mombasa Booking",
     };
 
-    console.log("📤 Sending STK request...");
     const response = await axios.post(
       "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
       stkData,
@@ -127,10 +135,16 @@ app.post("/stkpush", async (req, res) => {
     console.log("✅ STK SUCCESS:", response.data);
 
     if (guestData?.ref) {
-      updateBookingStatus(guestData.ref, "Pending Payment", {
-        checkoutRequestId: response.data.CheckoutRequestID,
-        merchantRequestId: response.data.MerchantRequestID,
-      });
+      const bookings = readBookings();
+      const idx = bookings.findIndex(b => b.ref === guestData.ref);
+
+      if (idx !== -1) {
+        bookings[idx].checkoutRequestId =
+          response.data.CheckoutRequestID || response.data.CheckoutRequestId;
+
+        bookings[idx].merchantRequestId = response.data.MerchantRequestID;
+        saveBookings(bookings);
+      }
     }
 
     res.json(response.data);
@@ -142,87 +156,148 @@ app.post("/stkpush", async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// ROUTE: POST /callback
+// CALLBACK (FIXED)
 // ═══════════════════════════════════════════════════════════════
 app.post("/callback", (req, res) => {
   console.log("\n💰 MPESA CALLBACK");
+
   try {
     const result = req.body?.Body?.stkCallback;
-    if (!result) return res.json({ ResultCode: 0, ResultDesc: "Accepted" });
+    if (!result) return res.json({ ResultCode: 0 });
+
     const bookings = readBookings();
-    const booking  = bookings.find(b => b.checkoutRequestId === result.CheckoutRequestID);
+
+    const checkoutId =
+      result.CheckoutRequestID || result.CheckoutRequestId;
+
+    const booking = bookings.find(
+      b => b.checkoutRequestId === checkoutId
+    );
+
     if (result.ResultCode === 0) {
       const meta = result.CallbackMetadata?.Item || [];
-      const get  = (name) => meta.find(i => i.Name === name)?.Value;
+
+      const get = (name) => {
+        const item = meta.find(i => i.Name === name);
+        return item ? item.Value : null;
+      };
+
       const paymentInfo = {
         mpesaReceiptNumber: get("MpesaReceiptNumber"),
         transactionDate: get("TransactionDate"),
         paidAmount: get("Amount"),
         paidPhone: get("PhoneNumber"),
       };
+
       console.log("✅ PAYMENT SUCCESS:", paymentInfo);
-      if (booking) updateBookingStatus(booking.ref, "Confirmed", { paymentInfo, paidAt: new Date().toISOString() });
+
+      if (booking) {
+        updateBookingStatus(booking.ref, "Confirmed", {
+          paymentInfo,
+          paidAt: new Date().toISOString()
+        });
+      }
+
     } else {
       console.log("❌ PAYMENT FAILED:", result.ResultDesc);
-      if (booking) updateBookingStatus(booking.ref, "Payment Failed", { failureReason: result.ResultDesc });
+
+      if (booking) {
+        updateBookingStatus(booking.ref, "Payment Failed", {
+          failureReason: result.ResultDesc
+        });
+      }
     }
+
   } catch (err) {
     console.error("Callback error:", err.message);
   }
+
   res.json({ ResultCode: 0, ResultDesc: "Accepted" });
 });
 
 // ═══════════════════════════════════════════════════════════════
-// ROUTE: POST /verify-sms
+// VERIFY SMS
 // ═══════════════════════════════════════════════════════════════
 app.post("/verify-sms", (req, res) => {
   const { ref, receiptNo, paidAmt, smsText } = req.body;
-  console.log(`\n📩 SMS VERIFY — Ref: ${ref}, Receipt: ${receiptNo}`);
-  if (!ref || !receiptNo) return res.status(400).json({ error: "ref and receiptNo required" });
+
+  if (!ref || !receiptNo) {
+    return res.status(400).json({ error: "ref and receiptNo required" });
+  }
+
   const updated = updateBookingStatus(ref, "Confirmed", {
-    paymentInfo: { mpesaReceiptNumber: receiptNo, paidAmount: paidAmt, verifiedViaSMS: true, smsText, transactionDate: new Date().toISOString() },
+    paymentInfo: {
+      mpesaReceiptNumber: receiptNo,
+      paidAmount: paidAmt,
+      verifiedViaSMS: true,
+      smsText,
+      transactionDate: new Date().toISOString()
+    },
     paidAt: new Date().toISOString(),
   });
-  if (!updated) return res.status(404).json({ error: "Booking not found" });
-  console.log(`✅ SMS verified — ${ref} confirmed`);
+
+  if (!updated) {
+    return res.status(404).json({ error: "Booking not found" });
+  }
+
   res.json({ success: true, booking: updated });
 });
 
 // ═══════════════════════════════════════════════════════════════
-// ROUTE: GET /bookings
+// GET BOOKINGS
 // ═══════════════════════════════════════════════════════════════
 app.get("/bookings", (req, res) => {
   res.json(readBookings());
 });
 
 // ═══════════════════════════════════════════════════════════════
-// ROUTE: PATCH /bookings/:ref
+// UPDATE BOOKING STATUS
 // ═══════════════════════════════════════════════════════════════
 app.patch("/bookings/:ref", (req, res) => {
   const { ref } = req.params;
   const { status } = req.body;
-  const allowed = ["Confirmed","Checked In","Checked Out","Cancelled","Pending Payment","Payment Failed"];
-  if (!allowed.includes(status)) return res.status(400).json({ error: "Invalid status" });
+
+  const allowed = [
+    "Confirmed",
+    "Checked In",
+    "Checked Out",
+    "Cancelled",
+    "Pending Payment",
+    "Payment Failed"
+  ];
+
+  if (!allowed.includes(status)) {
+    return res.status(400).json({ error: "Invalid status" });
+  }
+
   const extraData = {};
-  if (status === "Checked In")  extraData.actualCheckinTime  = new Date().toISOString();
+  if (status === "Checked In") extraData.actualCheckinTime = new Date().toISOString();
   if (status === "Checked Out") extraData.actualCheckoutTime = new Date().toISOString();
+
   const updated = updateBookingStatus(ref, status, extraData);
-  if (!updated) return res.status(404).json({ error: "Booking not found" });
-  console.log(`📝 ${ref} → ${status}`);
+
+  if (!updated) {
+    return res.status(404).json({ error: "Booking not found" });
+  }
+
   res.json(updated);
 });
 
 // ═══════════════════════════════════════════════════════════════
-// ROUTE: POST /admin-login
+// ADMIN LOGIN
 // ═══════════════════════════════════════════════════════════════
 app.post("/admin-login", (req, res) => {
   const { password } = req.body;
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin2024";
-  if (password === ADMIN_PASSWORD) res.json({ success: true });
-  else res.status(401).json({ error: "Wrong password" });
+
+  if (password === ADMIN_PASSWORD) {
+    res.json({ success: true });
+  } else {
+    res.status(401).json({ error: "Wrong password" });
+  }
 });
 
-// ─── START ───────────────────────────────────────────────────
+// ─── START SERVER ─────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`\n🚀 Server running on port ${PORT}\n`);
 });
